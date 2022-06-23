@@ -36,7 +36,7 @@ export class TelegramService {
     if (/[\d\.\-A-z]/.test(name)) {
       name = 'Здравствуйте!';
     } else {
-      name = `Зравстсвуйте, ${name}!`;
+      name = `Здравствуйте, ${name}!`;
     }
     const textJson = JSON.parse(
       fs
