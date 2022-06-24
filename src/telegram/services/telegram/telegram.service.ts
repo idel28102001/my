@@ -2,9 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { StringSession } from 'telegram/sessions';
 import { TelegramClient } from 'telegram';
 import { Telegraf } from 'telegraf';
+import * as BigInt from 'big-integer';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as BigInt from 'big-integer';
 
 @Injectable()
 export class TelegramService {
@@ -52,17 +52,18 @@ export class TelegramService {
 
     const client = await this.getTelegramClient(process.env.SESSION_HASH);
     const id = member.id;
-    const aaa = BigInt(id.toString());
-    await client.sendMessage(aaa, {
+    const bbb = await client.getParticipants(BigInt(process.env.CHAT));
+    const ccc = BigInt(id);
+    await client.sendMessage(ccc, {
       message: first,
       parseMode: 'html',
     });
 
-    await client.sendMessage(aaa, {
+    await client.sendMessage(ccc, {
       message: second,
       parseMode: 'html',
     });
-    await client.sendMessage(aaa, {
+    await client.sendMessage(ccc, {
       message: third,
       parseMode: 'html',
     });
