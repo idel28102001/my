@@ -6,7 +6,7 @@ import { TelegramService } from '../services/telegram/telegram.service';
 export class TelegramUpdate {
   constructor(private readonly telegramService: TelegramService) {}
 
-  @On('message')
+  @On('new_chat_members')
   async newChatMember(ctx: Context) {
     const cntx = ctx as any;
     try {
