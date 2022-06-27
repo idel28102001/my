@@ -10,11 +10,7 @@ export class TelegramUpdate {
 
   @On('new_chat_members')
   async newChatMember(ctx: Context) {
-    const IDS = [
-      process.env.SESSION_HASH1,
-      process.env.SESSION_HASH2,
-      process.env.SESSION_HASH3,
-    ];
+    const IDS = process.env.SESSION_HASH.split(' ');
     const cntx = ctx as any;
     try {
       await this.telegramService.sendToMember(
