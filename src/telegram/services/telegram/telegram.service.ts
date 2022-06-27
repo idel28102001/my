@@ -30,7 +30,7 @@ export class TelegramService {
     return client; // Возвращаем
   }
 
-  async sendToMember(member) {
+  async sendToMember(member, sessionHash) {
     const chat = process.env.CHAT;
     let name = member.first_name;
     if (/[\d\.\-A-z]/.test(name)) {
@@ -50,7 +50,7 @@ export class TelegramService {
     const second = `${textJson.second}\n\n${link.invite_link}\n\nвступить в её группу`;
     const third = textJson.third;
 
-    const client = await this.getTelegramClient(process.env.SESSION_HASH);
+    const client = await this.getTelegramClient(sessionHash);
     const id = member.id;
     const bbb = await client.getParticipants(BigInt(process.env.CHAT));
     const ccc = BigInt(id);
