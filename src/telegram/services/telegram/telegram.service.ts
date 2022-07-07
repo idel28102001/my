@@ -2,15 +2,17 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { StringSession } from 'telegram/sessions';
 import { TelegramClient } from 'telegram';
 import { Telegraf } from 'telegraf';
-import * as BigInt from 'big-integer';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Context } from 'vm';
+import { UsersService } from '../../../users/services/users.service';
+import { UserEntity } from '../../../users/entities/users.entity';
 
 @Injectable()
 export class TelegramService {
   readonly bot: Telegraf;
 
-  constructor() {
+  constructor(private readonly usersService: UsersService) {
     this.bot = new Telegraf(process.env.TOKEN);
   }
 
@@ -30,8 +32,7 @@ export class TelegramService {
     return client; // Возвращаем
   }
 
-  async sendToMember(member, sessionHash) {
-    const chat = process.env.CHAT;
+  async sensWholeMessage(ctx: Context, member) {
     let name = member.first_name;
     if (/[\d\.\-A-z]/.test(name)) {
       name = 'Здравствуйте!';
@@ -44,28 +45,48 @@ export class TelegramService {
         .toString(),
     );
     const first = `${name}\n${textJson.first}`;
-    const link = await this.bot.telegram.createChatInviteLink(chat, {
-      name: `${member.first_name}${member.last_name || ''}-${member.id}`,
-    });
+    const link = await this.bot.telegram.createChatInviteLink(
+      process.env.CHAT,
+      {
+        name: `${member.first_name}${member.last_name || ''}-(${member.id})`,
+      },
+    );
     const second = `${textJson.second}\n\n${link.invite_link}\n\nвступить в её группу`;
+    await this.saveToDB({
+      username: member.username,
+      lastname: member.last_name,
+      firstname: member.first_name,
+      telegramId: member.id.toString(),
+      referallink: link.invite_link,
+    });
     const third = textJson.third;
+    await ctx.reply(first);
+    await ctx.reply(second);
+    await ctx.reply(third);
+  }
 
-    const client = await this.getTelegramClient(sessionHash);
-    const id = member.id;
-    const bbb = await client.getParticipants(BigInt(process.env.CHAT));
-    const ccc = BigInt(id);
-    await client.sendMessage(ccc, {
-      message: first,
-      parseMode: 'html',
-    });
+  async saveToDB(elem) {
+    const elems = this.usersService.create(elem);
+    return await this.usersService.save(elems);
+  }
 
-    await client.sendMessage(ccc, {
-      message: second,
-      parseMode: 'html',
-    });
-    await client.sendMessage(ccc, {
-      message: third,
-      parseMode: 'html',
-    });
+  async sendToMember(ctx: Context) {
+    const cntx = ctx as any;
+    const member = cntx.update.message.from;
+    const user = await this.checkIfInBase(member);
+    if (user) {
+      return await this.sendRefLinkAgain(ctx, user);
+    } else {
+      return await this.sensWholeMessage(ctx, member);
+    }
+  }
+
+  async sendRefLinkAgain(ctx: Context, user: UserEntity) {
+    const referalLink = user.referallink;
+    await ctx.reply(`Вы уже имеете свою реферальную ссылку - ${referalLink}`);
+  }
+
+  async checkIfInBase(member) {
+    return await this.usersService.findByTelegramId(member.id.toString());
   }
 }
