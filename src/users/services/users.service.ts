@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { UserEntity } from '../entities/users.entity';
 
 @Injectable()
@@ -18,7 +18,10 @@ export class UsersService {
     return this.usersRepo.create(elems);
   }
 
-  async findByTelegramId(id: string) {
-    return await this.usersRepo.findOne({ where: { telegramId: id } });
+  async findByTelegramId(id: string, options?: FindOneOptions<UserEntity>) {
+    return await this.usersRepo.findOne({
+      ...{ where: { telegramId: id.toString() } },
+      ...options,
+    });
   }
 }

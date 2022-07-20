@@ -6,8 +6,6 @@ import { TelegramService } from '../services/telegram/telegram.service';
 export class TelegramUpdate {
   constructor(private readonly telegramService: TelegramService) {}
 
-  private i = 0;
-
   @On('new_chat_members')
   async newChatMember(ctx: Context) {
     const cntx = ctx as any;
@@ -32,7 +30,16 @@ export class TelegramUpdate {
 
   @Start()
   async start(ctx: Context) {
-    const cntx = ctx as any;
-    await this.telegramService.sendToMember(ctx);
+    await this.telegramService.handleMember(ctx);
   }
+
+  // @Command('/makemeadmin')
+  // async makeMeAdmin(ctx: Context) {
+  //   await this.telegramService.makeMeAdmin(ctx);
+  // }
+  //
+  // @Command('/signup')
+  // async signUp(ctx: Context) {
+  //   await this.telegramService.signUp(ctx);
+  // }
 }

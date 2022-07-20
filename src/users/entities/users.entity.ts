@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { RolesEnum } from '../enums/roles.enum';
+import { SignupsEntity } from '../../signups/entities/signups.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -17,6 +19,12 @@ export class UserEntity {
   @Column({ nullable: true })
   lastname: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   referallink: string;
+
+  @Column({ default: RolesEnum.USER })
+  role: string;
+
+  @OneToMany(() => SignupsEntity, (signups) => signups.user)
+  signups: SignupsEntity[];
 }

@@ -6,6 +6,7 @@ import { config } from './common/config';
 import { session } from 'telegraf';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
+import { SignupsModule } from './signups/signups.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { UsersModule } from './users/users.module';
       },
     }),
     UsersModule,
+    SignupsModule,
   ],
   controllers: [],
   providers: [],
