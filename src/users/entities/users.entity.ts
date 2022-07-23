@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { RolesEnum } from '../enums/roles.enum';
 import { SignupsEntity } from '../../signups/entities/signups.entity';
 
@@ -6,6 +12,9 @@ import { SignupsEntity } from '../../signups/entities/signups.entity';
 export class UserEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
+
+  @CreateDateColumn({ nullable: true })
+  createdAt: number;
 
   @Column({ nullable: false, unique: true })
   telegramId: string;
