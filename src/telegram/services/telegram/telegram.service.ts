@@ -140,6 +140,11 @@ export class TelegramService {
   async sendGift(ctx) {
     const client = await this.getTelegramClient(process.env.BOT_SESSION);
     // const currPath = path.join(__dirname, '../../../../folders/gift.mp3');
+    const member = ctx.update.message.from;
+    const user = await this.usersService.findByTelegramId(member.id);
+    if (!user) {
+      await this.saveToDB(member);
+    }
     const fromId = ctx.update.message.from.id;
     const toId = await client.getEntity(fromId);
     const result = JSON.parse(fs.readFileSync('some').toString());
